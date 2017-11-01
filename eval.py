@@ -43,7 +43,7 @@ def glove2dict(src_filename):
 data = fetch_20newsgroups(subset='all',remove=['headers', 'footers','quotes'])
 vectorizer = CountVectorizer(dtype=np.int32,stop_words='english',max_df=0.8,min_df=1e-3,strip_accents='ascii') #TfidfVectorizer #CountVectorizer
 data_t = vectorizer.fit_transform(data.data).tocsr()
-X = data_t.todense()
+X = data_t
 word_to_idx =  vectorizer.vocabulary_
 idx_to_word = {v: k for k, v in word_to_idx.items()}
 
@@ -61,7 +61,7 @@ if getVec:
 	probs = (probs/probs.sum(0)).T
 
 # fit topic model
-models = ['wLDA2']
+models = ['LDA','wLDA','wLDA2']
 
 for model in models:
 	for k in [5]:
@@ -71,13 +71,13 @@ for model in models:
 			res = lda.components_
 			doc = lda.transform(X)
 		elif model == 'wLDA':
-			lda = LatentDirichletAllocation(k,learning_method='online')#,word_probs=probs)
-			lda.fit(X.dot(probs))
+			lda = LatentDirichletAllocation(k,learning_method='online',word_probs=probs)
+			lda.fit(X)
 			res = lda.components_
 			doc = lda.transform(X)
 		elif model == 'wLDA2':
-			lda = LatentDirichletAllocation(k,learning_method='online')#,word_probs=probs.T)
-			lda.fit(X.dot(probs.T))
+			lda = LatentDirichletAllocation(k,learning_method='batch',word_probs=probs.T)
+			lda.fit(X)
 			res = lda.components_
 			doc = lda.transform(X)
 		elif model == 'PMF':

@@ -401,9 +401,9 @@ class LatentDirichletAllocation(BaseEstimator, TransformerMixin):
             suff_stats = np.zeros(self.components_.shape)
             for sstats in sstats_list:
                 suff_stats += sstats
-            #if self.word_probs is not None:
-            #    suff_stats *= self.exp_dirichlet_component_.dot(self.word_probs)
-            #else:
+            if self.word_probs is not None:
+                suff_stats *= self.exp_dirichlet_component_.dot(self.word_probs)
+            else:
                 suff_stats *= self.exp_dirichlet_component_
         else:
             suff_stats = None
@@ -455,8 +455,12 @@ class LatentDirichletAllocation(BaseEstimator, TransformerMixin):
                                            + doc_ratio * suff_stats))
 
         # update `component_` related variables
-        self.exp_dirichlet_component_ = np.exp(
-            _dirichlet_expectation_2d(self.components_))
+        if self.word_probs is not None:
+            self.exp_dirichlet_component_ = np.exp(
+                _dirichlet_expectation_2d(self.components_.dot(self.word_probs)))
+        else:
+            self.exp_dirichlet_component_ = np.exp(
+                _dirichlet_expectation_2d(self.components_))
         self.n_batch_iter_ += 1
         return
 
