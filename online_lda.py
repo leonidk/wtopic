@@ -33,7 +33,8 @@ EPS = np.finfo(np.float).eps
 
 def _update_doc_distribution(X, exp_topic_word_distr, doc_topic_prior,
                              max_iters,
-                             mean_change_tol, cal_sstats, random_state):
+                             mean_change_tol, cal_sstats, random_state, 
+                             word_probs):
     """E-step: update document-topic distribution.
 
     Parameters
@@ -63,6 +64,10 @@ def _update_doc_distribution(X, exp_topic_word_distr, doc_topic_prior,
         Parameter that indicate how to initialize document topic distribution.
         Set `random_state` to None will initialize document topic distribution
         to a constant number.
+
+    word_covariance :  array-like, shape=(n_samples, n_samples)
+        Probabilities for P(word_i | word_j)
+
 
     Returns
     -------
@@ -266,7 +271,7 @@ class LatentDirichletAllocation(BaseEstimator, TransformerMixin):
                  learning_decay=.7, learning_offset=10., max_iter=10,
                  batch_size=128, evaluate_every=-1, total_samples=1e6,
                  perp_tol=1e-1, mean_change_tol=1e-3, max_doc_update_iter=100,
-                 n_jobs=1, verbose=0, random_state=None, n_topics=None):
+                 n_jobs=1, verbose=0, random_state=None, n_topics=None, word_probs=None):
         self.n_components = n_components
         self.doc_topic_prior = doc_topic_prior
         self.topic_word_prior = topic_word_prior
@@ -284,6 +289,7 @@ class LatentDirichletAllocation(BaseEstimator, TransformerMixin):
         self.verbose = verbose
         self.random_state = random_state
         self.n_topics = n_topics
+        self.word_probs = word_probs
 
     def _check_params(self):
         """Check model parameters."""
@@ -382,7 +388,7 @@ class LatentDirichletAllocation(BaseEstimator, TransformerMixin):
                                               self.doc_topic_prior_,
                                               self.max_doc_update_iter,
                                               self.mean_change_tol, cal_sstats,
-                                              random_state)
+                                              random_state, self.word_probs)
             for idx_slice in gen_even_slices(X.shape[0], n_jobs))
 
         # merge result
@@ -395,7 +401,10 @@ class LatentDirichletAllocation(BaseEstimator, TransformerMixin):
             suff_stats = np.zeros(self.components_.shape)
             for sstats in sstats_list:
                 suff_stats += sstats
-            suff_stats *= self.exp_dirichlet_component_
+            #if self.word_probs is not None:
+            #    suff_stats *= self.exp_dirichlet_component_.dot(self.word_probs)
+            #else:
+                suff_stats *= self.exp_dirichlet_component_
         else:
             suff_stats = None
 

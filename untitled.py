@@ -21,7 +21,7 @@ for col in range(len(documents)):
         X[int(row.split(':')[0])-1,col] = int(row.split(':')[1])
 Xorig = X.copy()
 
-tfIDF = False
+tfIDF = True
 
 if tfIDF:
 	idf = np.log((1.0+np.sum(X > 0, 1))/+1.0)+1.0
