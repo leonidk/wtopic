@@ -116,7 +116,7 @@ for model in models:
 
 			correct = np.diagonal(confusion_matrix).sum()
 			total = np.sum(confusion_matrix)
-			print("{0} {1] {2} Accuracy {3:.3f}".format(metric,model,k,correct/total))
+			print("{0} {1} {2} Accuracy {3:.3f}".format(metric,model,k,correct/total))
 #plt.imshow(confusion_matrix,interpolation='nearest')
 #plt.axis('off')
 #plt.show()
