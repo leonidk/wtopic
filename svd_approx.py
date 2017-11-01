@@ -9,11 +9,13 @@ def grad_svd(A,rank,lr):
 		e = A - P.dot(Q)
 		P += lr * e.dot(Q.T)
 		Q += lr * P.T.dot(e)
-		if np.linalg.norm(eo) - np.linalg.norm(e) < lr:
+		diff = np.linalg.norm(eo) - np.linalg.norm(e)
+		if diff < lr:
 			break
 		eo = e
-	S1 = np.sqrt(np.sum(P**2,0))
-	S2 = np.sqrt(np.sum(Q**2,1)) 
+		#print(diff)
+	S1 =np.sqrt(np.sum(P**2,0))
+	S2 =np.sqrt(np.sum(Q**2,1)) 
 
 	U = P/S1
 	V = (Q.T/S2).T
@@ -29,6 +31,6 @@ if __name__ == '__main__':
 	print("low-rank error",err(A,u[:,:k].dot(np.diag(s[:k])).dot(vt[:k,:])))
 	full_err = err(A,u[:,:k].dot(np.diag(s[:k])).dot(vt[:k,:]))
 	
-	U,S,V = grad_svd(A,5,1e-5)
+	U,S,V = grad_svd(A,5,1e-3)
 
 	print("low-rank-approx error",err(A,U.dot(np.diag(S).dot(V))))

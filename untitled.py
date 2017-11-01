@@ -21,7 +21,7 @@ for col in range(len(documents)):
         X[int(row.split(':')[0])-1,col] = int(row.split(':')[1])
 Xorig = X.copy()
 
-tfIDF = True
+tfIDF = False
 
 if tfIDF:
 	idf = np.log((1.0+np.sum(X > 0, 1))/+1.0)+1.0
@@ -44,7 +44,7 @@ print(err(Xk))
 
 t = 10
 for i in range(k):
-	maxidx = np.argsort(u[:,i])[::-1]
+	maxidx = np.argsort(np.abs(u[:,i]))[::-1]
 	print("{} {}".format(i,np.array(vocabs)[maxidx[:t]]))
 
 from sklearn.decomposition import LatentDirichletAllocation
@@ -52,5 +52,5 @@ lda = LatentDirichletAllocation(k,learning_method='online')
 lda.fit(Xorig)
 res = lda.transform(Xorig)
 for i in range(k):
-	maxidx = np.argsort(res[:,i])[::-1]
+	maxidx = np.argsort(np.abs(res[:,i]))[::-1]
 	print("{} {}".format(i,np.array(vocabs)[maxidx[:t]]))
