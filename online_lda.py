@@ -443,7 +443,7 @@ class LatentDirichletAllocation(BaseEstimator, TransformerMixin):
 
         # M-step
         if batch_update:
-            self.components_ = self.topic_word_prior_ + suff_stats
+            self.components_ = self.topic_word_prior_ + suff_stats#.dot(self.word_probs)
         else:
             # online update
             # In the literature, the weight is `rho`

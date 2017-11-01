@@ -48,7 +48,7 @@ word_to_idx =  vectorizer.vocabulary_
 idx_to_word = {v: k for k, v in word_to_idx.items()}
 
 getVec = True
-alpha = 1.0
+alpha = 2.0
 if getVec:
 	wordvecs = glove2dict('data/glove.6B.50d.txt')
 	vecs = np.zeros((data_t.shape[1],50))
@@ -61,25 +61,25 @@ if getVec:
 	probs = (probs/probs.sum(0)).T
 
 # fit topic model
-models = ['LDA','wLDA2']
+models = ['wLDA2']
 
 for model in models:
-	for k in [5,10,20,30]:
+	for k in [5]:
 		if model == 'LDA':
-			lda = LatentDirichletAllocation(k,learning_method='batch')
+			lda = LatentDirichletAllocation(k,learning_method='online')
 			lda.fit(X)
 			res = lda.components_
 			doc = lda.transform(X)
 		elif model == 'wLDA':
-			lda = LatentDirichletAllocation(k,learning_method='batch',word_probs=probs)
-			lda.fit(X)
+			lda = LatentDirichletAllocation(k,learning_method='online')#,word_probs=probs)
+			lda.fit(X.dot(probs))
 			res = lda.components_
-			doc = lda.transform(X.dot(probs))
+			doc = lda.transform(X)
 		elif model == 'wLDA2':
-			lda = LatentDirichletAllocation(k,learning_method='batch',word_probs=probs.T)
-			lda.fit(X)
+			lda = LatentDirichletAllocation(k,learning_method='online')#,word_probs=probs.T)
+			lda.fit(X.dot(probs.T))
 			res = lda.components_
-			doc = lda.transform(X.dot(probs.T))
+			doc = lda.transform(X)
 		elif model == 'PMF':
 			U,S,V = grad_svd(X,k,1e-4)
 			res = V
